@@ -1,0 +1,8 @@
+(* OASIS_START *)
+(* DO NOT EDIT (digest: bd1c3ab88f6b8d787273116fa6c394f7) *)
+
+Authors of battleship:
+
+* Tim McGilchrist
+
+(* OASIS_STOP *)

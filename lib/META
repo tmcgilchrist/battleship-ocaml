@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 55e393850387f63c7063c291ae9f0af3)
+version = "0.0.1"
+description = "Battleship simulation library"
+requires = "core"
+archive(byte) = "battleship.cma"
+archive(byte, plugin) = "battleship.cma"
+archive(native) = "battleship.cmxa"
+archive(native, plugin) = "battleship.cmxs"
+exists_if = "battleship.cma"
+# OASIS_STOP
+
