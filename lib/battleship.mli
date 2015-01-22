@@ -10,10 +10,11 @@ type position = Occupied of ship_type * bool
               | Hit
               | Miss
 
-type board = ((int * char) * position) list
-
 type direction = Across | Down
+
 type point = int * char * direction
+
+type board = (int * char * position) list
 
 val carrier :  ship
 val battleship : ship
@@ -21,8 +22,17 @@ val submarine : ship
 val cruiser : ship
 val patrol : ship
 
-val empty_board : board
-val random_board : board
-val place_ship : board -> ship -> (int * char * direction) -> board option
-val attack : board -> (int * char) -> board
-val to_string: board -> string
+val place_ship : (int * char, position) Core.Std.List.Assoc.t ->
+                 ship ->
+                 int * char * direction ->
+                 (int * char, position) Core.Std.List.Assoc.t option
+val empty_board : ((int * char) * position) list
+val random_ship : (int * char, position) Core.Std.List.Assoc.t ->
+                  ship -> (int * char, position) Core.Std.List.Assoc.t
+val random_board : unit -> ((int * char) * position) list
+val attack : ('a, position) Core.Std.List.Assoc.t ->
+             'a -> ('a, position) Core.Std.List.Assoc.t
+val finished : position list -> bool
+val print_cell : bytes -> (int * char) * position -> bytes
+val to_string : ((int * char) * position) list -> bytes
+val print_board : ((int * char) * position) list -> unit

@@ -22,5 +22,4 @@ true: annot, bin_annot
 <lib_test/*.ml{,i}>: pkg_battleship
 # OASIS_STOP
 
-true: package(core)
 true: thread,debug
