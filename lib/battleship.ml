@@ -9,14 +9,10 @@ type ship_type = Carrier
 type ship = { ship_type : ship_type; size : int; }
 type position = Occupied of ship_type * bool
               | Unoccupied
-              | Hit
-              | Miss
 
 type direction = Across | Down
 
-type point = int * char * direction
-
-type board = (int * char * position) list
+type board = (int * char, position) Core.Std.List.Assoc.t
 
 let carrier    = {ship_type = Carrier;    size = 5}
 let battleship = {ship_type = Battleship; size = 4}
@@ -41,12 +37,11 @@ let place_ship board ship p =
     ((Int.between i 0 9) &&
        (Int.between (i + ship.size) 1 9)) in
   let place_ship_at board ps ship =
-            Some (List.fold_left ps
-                             ~init:board
-                             ~f:(fun b a -> let minus = List.Assoc.remove b a in
-                                            List.Assoc.add
-                                              minus a (Occupied(ship.ship_type,
-                                                                false)))) in
+    List.fold_left ps
+                   ~init:board
+                   ~f:(fun b a ->
+                       let minus = List.Assoc.remove b a in
+                       List.Assoc.add minus a (Occupied(ship.ship_type, false))) in
   match p with
   | (x, y, Down) ->
      (match (int_in_range x 9) with
@@ -55,21 +50,19 @@ let place_ship board ship p =
         let ps = List.map (List.range x (x+ship.size)) ~f: (fun a -> (a, y)) in
 
         (* lookup each of those positions and place the ship there *)
-        place_ship_at board ps ship
+        Some (place_ship_at board ps ship)
      | false -> None)
   | (x, y, Across) ->
      (match (char_in_range y) with
      | true ->
         (* position from x,y going across (increasing y) *)
-
         let yi = (Char.to_int y) in
         let ps = List.map (List.range yi (yi+ship.size))
                           ~f: (fun a -> (x, Char.of_int_exn a)) in
 
         (* lookup each of those positions and place the ship there *)
-        place_ship_at board ps ship
+        Some (place_ship_at board ps ship)
      | false -> None)
-
 
 let empty_board =
   let row x =
@@ -88,48 +81,47 @@ let random_board() =
   List.fold_left all_ships ~init: empty_board ~f:random_ship
 
 let attack board a =
-  match List.Assoc.find_exn board a with
-  | Occupied (t, _) ->
+  match List.Assoc.find board a with
+  | Some (Occupied (t, _)) ->
      let minus = List.Assoc.remove board a in
-     List.Assoc.add minus a (Occupied(t, true))
-  | Unoccupied -> board
-  | Hit -> board (* Should disallow these last 2 states *)
-  | Miss -> board (* should update board to show miss *)
+     let new_board = List.Assoc.add minus a (Occupied(t, true)) in
+     Some new_board
+  | Some (Unoccupied) -> None
+  | None -> None
 
 let finished board =
   let hit h p = match p with
-    |Occupied (t, true) -> h+1
-    |Occupied (t, false) -> h
-    |Unoccupied -> h
-    |Hit -> h
-    |Miss -> h in
+    | (x,y), Occupied (t, true) -> h+1
+    | (x,y), Occupied (t, false) -> h
+    | (x,y), Unoccupied -> h in
   let hits = List.fold_left board ~init:0 ~f:hit in
   hits = List.fold_left all_ships ~init:0 ~f:(fun a s -> a + s.size)
 
 (********************** Scratch / Util **********************)
 
 let print_cell str cell =
-  let new_line col = match col with
+  let new_line col row = match col with
     | 'j' -> "\n"
     | _ -> "" in
   match cell with
   | (x,y), Occupied (ship_type, hit) ->
-     sprintf "%s S(%i,%c) %s" str x y (new_line y)
-  | (x,y), Unoccupied                -> str ^ " U    " ^ new_line(y)
-  | (x,y), Hit                       -> str ^ " H    " ^ new_line(y)
-  | (x, y), Miss                     -> str ^ " M    " ^ new_line(y)
+     sprintf "%s S(%i,%c) %s" str x y (new_line y x)
+  | (x,y), Unoccupied                ->
+     sprintf "%s U(%i,%c) %s" str x y (new_line y x)
+
+(** Sort the board pairwise *)
+let sort_board board =
+  let lex_cmp (x,y) (x',y') =
+    let compare_fst = compare x x' in
+    if compare_fst <> 0 then compare_fst
+    else compare y y' in
+  List.sort ~cmp:lex_cmp board
 
 let to_string board =
-  List.fold_left board ~init:"" ~f:(fun acc e -> print_cell acc  e)
+  let sorted_board = sort_board board in
+  List.fold_left sorted_board ~init: "" ~f:print_cell
 
 let print_board board =
-  let formated_board = List.fold_left board ~init: "" ~f:print_cell in
-  Printf.printf "Current board \n ";
-  List.iter columns (printf "%c") ;
-  Printf.printf "\n";
-  Printf.printf"%s \n" formated_board
-
-let sort_pairs c1 c2 =
-  let (x,y), _ = c1 in
-  let (a,b), _ = c2 in
-  x < a || (x = a && y < b)
+  let heading = List.fold_left columns ~init:""
+                               ~f:(fun a c -> sprintf"%s%c       " a c) in
+  Printf.printf "Current board \n %s\n\n%s\n" heading (to_string board)

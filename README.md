@@ -65,23 +65,28 @@ The minimal set of operations we want to support:
 
  - Create an empty board. (DONE)
 
- - Place a ship on the board. (Needs check on position and direction)
+ - Place a ship on the board. (DONE)
 
- - Create a random board with the ships already placed.
+ - Create a random board with the ships already placed. (DONE)
 
  - Make an attacking move, determining if it is a hit or a miss and
-   updating the game state. (Needs check on position)
+   updating the game state. (DONE)
 
  - Determine the current state of the game, finished (and who won),
-   in play.
+   in play. (provide finished function for a board)
 
 
 TODO
 ----------
 
-  * Add direction to ship placement function
-  * Remove _exn versions of functions so they return option types
+  * Check attack position is valid (Uses List.Assoc.find with an option, if
+    invalid position it returns None) (DONE)
+  * Make board sorted in print_board (DONE)
+  * Fix types exported in .mli (DONE)
+
+  * Attack returns updated board and result of attack (DONE)
+  * Remove _exn versions of functions so they return option types (Mostly).
+    _exn's left show where we expect to convert between chars in a know range
+    and if theyre outside that range something is wrong internally.
   * Write a dumb agent to play game.
-  * Make ship placement function check ship will fit into board
-  * random_board implementation
-  * use phantom types to ensure different boards aren't used in the wrong place
+  * write test case for entire game, using opposition board and attack board

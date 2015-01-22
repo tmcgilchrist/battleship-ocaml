@@ -7,14 +7,10 @@ type ship_type = Carrier
 type ship = { ship_type : ship_type; size : int; }
 type position = Occupied of ship_type * bool
               | Unoccupied
-              | Hit
-              | Miss
 
 type direction = Across | Down
 
-type point = int * char * direction
-
-type board = (int * char * position) list
+type board = (int * char, position) Core.Std.List.Assoc.t
 
 val carrier :  ship
 val battleship : ship
@@ -22,17 +18,29 @@ val submarine : ship
 val cruiser : ship
 val patrol : ship
 
-val place_ship : (int * char, position) Core.Std.List.Assoc.t ->
+(** Places a ship at position x,y, Down|Across returns Some(board) on success *)
+(** otherwise None if the position is invalid or already occupied *)
+val place_ship : board ->
                  ship ->
                  int * char * direction ->
-                 (int * char, position) Core.Std.List.Assoc.t option
-val empty_board : ((int * char) * position) list
-val random_ship : (int * char, position) Core.Std.List.Assoc.t ->
-                  ship -> (int * char, position) Core.Std.List.Assoc.t
-val random_board : unit -> ((int * char) * position) list
-val attack : ('a, position) Core.Std.List.Assoc.t ->
-             'a -> ('a, position) Core.Std.List.Assoc.t
-val finished : position list -> bool
-val print_cell : bytes -> (int * char) * position -> bytes
-val to_string : ((int * char) * position) list -> bytes
-val print_board : ((int * char) * position) list -> unit
+                 board option
+
+(** Generate an empty 10*10 board *)
+val empty_board : board
+
+(** Generate a board with ships placed randomly *)
+val random_board : unit -> board
+
+(** attacks a position, retuning Some(board) if successful otherwise None *)
+val attack : board ->
+             int * char ->
+             board option
+(** Given a players attacking board returns bool whether all ships have been *)
+(** hit*)
+val finished : board -> bool
+
+(** Prints a board as a string for testing *)
+val to_string : board -> bytes
+
+(** Prints a formatted board to stdout *)
+val print_board : board -> unit
