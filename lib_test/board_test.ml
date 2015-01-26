@@ -2,41 +2,66 @@ open Core.Std
 open OUnit2
 module B = Battleship
 
-let aeb exp got _test_ctxt = assert_equal ~printer:B.to_string exp got
+(* let test_place_ship = *)
+(*   [ *)
+(*     "place carrier">:: *)
+(*       aei 15 15 *)
+(*   ] *)
+
+(* let test_random_board text_ctx = *)
+(*   [ *)
+(*     "random_board contains 15 spots">: *)
+(*       aei 15 1 *)
+(*   ] *)
+
+(* let test_attack_board text_ctx = *)
+(*   [ *)
+(*     "attack board">: *)
+(*       aei 15 1 *)
+(*   ] *)
+let test_place_ship text_ctx ship position msg =
+    let b_option = B.place_ship B.empty_board
+                                ship position in
+    match b_option with
+    | Some b ->
+       let l = List.fold_left b
+                              ~init:0
+                              ~f:(fun a c -> match c with
+                                             | p, B.Occupied (_,_) -> a + 1
+                                             | _, _ -> a) in
+       assert_equal ship.size l ~msg:msg
+    | None -> assert_equal 1 0
 
 let tests =
-  [
-    "empty_board">::
-      aeb B.empty_board B.empty_board
-  ]
+  "Battleship Tests" >:::
+    [
+      "empty board" >:: (fun test_ctxt ->
+                         assert_equal ~printer:B.to_string B.empty_board
+                                      B.empty_board);
+
+      "place carrier" >:: (fun test_ctx ->
+                           test_place_ship test_ctx B.carrier (1,'a',B.Down) "Carrier should be 5 squares long");
+
+      "place battleship" >:: (fun test_ctx ->
+                           test_place_ship test_ctx B.battleship (1,'a',B.Across) "Battleship should be 4 squares long");
+
+      "place submarine" >:: (fun test_ctx ->
+                           test_place_ship test_ctx B.submarine (1,'a',B.Across) "Submarine should be 3 squares long");
+
+      "place cruiser" >:: (fun test_ctx ->
+                           test_place_ship test_ctx B.cruiser (1,'a',B.Across) "Cruiser should be 2 squares long");
+
+      "random board" >:: (fun test_ctx ->
+                          let l = List.fold_left (B.random_board()) ~init:0
+                                                 ~f:(fun a c -> match c with
+                                                                | (x,y), B.Occupied (_,_) -> a + 1
+                                                                | _ -> a) in
+                          assert_equal
+                            15 l ~msg:
+                            "All ships should be present on a random board" ~printer:string_of_int)
+
+
+    ]
 
 let () =
-  run_test_tt_main ("board-ops tests" >::: tests)
-
-
-
-(* (\* *)
-(*  Test board related functions like creating board, placing ships, etc *)
-(*  *\) *)
-(* type player = { *)
-(*     attack_b: board; *)
-(*     defense_b: board; *)
-(*   } *)
-
-(* (\* *)
-
-(*  *\) *)
-
-(* let player_1 = *)
-(*   let board_1 = random_board() in *)
-(*   let board_2 = empty_board() in *)
-(*   { attack_b = board_2; *)
-(*     defense_b = board_1;} *)
-
-(* let player_2 = *)
-(*   let board_1 = random_board() in *)
-(*   let board_2 = empty_board() in *)
-(*   { attack_b = board_2; *)
-(*     defense_b = board_1;} *)
-
-(* let _ = *)
+  run_test_tt_main ("all" >::: [tests])
