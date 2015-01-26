@@ -64,14 +64,10 @@ non-overlapping positions on their own board:
 The minimal set of operations we want to support:
 
  - Create an empty board. (DONE)
-
  - Place a ship on the board. (DONE)
-
  - Create a random board with the ships already placed. (DONE)
-
  - Make an attacking move, determining if it is a hit or a miss and
    updating the game state. (DONE)
-
  - Determine the current state of the game, finished (and who won),
    in play. (provide finished function for a board)
 
@@ -83,10 +79,9 @@ TODO
     invalid position it returns None) (DONE)
   * Make board sorted in print_board (DONE)
   * Fix types exported in .mli (DONE)
-
   * Attack returns updated board and result of attack (DONE)
   * Remove _exn versions of functions so they return option types (Mostly).
     _exn's left show where we expect to convert between chars in a know range
     and if theyre outside that range something is wrong internally.
   * Write a dumb agent to play game.
-  * write test case for entire game, using opposition board and attack board
+  * Write test case for entire game, using opposition board and attack board
