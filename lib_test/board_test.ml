@@ -2,23 +2,6 @@ open Core.Std
 open OUnit2
 module B = Battleship
 
-(* let test_place_ship = *)
-(*   [ *)
-(*     "place carrier">:: *)
-(*       aei 15 15 *)
-(*   ] *)
-
-(* let test_random_board text_ctx = *)
-(*   [ *)
-(*     "random_board contains 15 spots">: *)
-(*       aei 15 1 *)
-(*   ] *)
-
-(* let test_attack_board text_ctx = *)
-(*   [ *)
-(*     "attack board">: *)
-(*       aei 15 1 *)
-(*   ] *)
 let test_place_ship text_ctx ship position msg =
     let b_option = B.place_ship B.empty_board
                                 ship position in
