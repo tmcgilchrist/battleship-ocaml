@@ -29,46 +29,52 @@ let random_direction =
   | true -> Down
   | false -> Across
 
+let int_in_range i size =
+  ((Int.between i 0 9) &&
+     (Int.between (i + size) 1 9))
+
+let char_in_range c size =
+  (Char.between c 'a' 'j') &&
+    (Char.between(Char.of_int_exn(Char.to_int(c) + size)) 'a' 'j')
+
+let positions_unoccupied board p =
+  List.fold_left p ~init:false
+                 ~f:(fun a c -> match (List.Assoc.find board c) with
+                                | Some (Unoccupied)   -> a
+                                | Some (Occupied (_)) -> a || true
+                                | None                -> a)
+
 let place_ship board ship p =
-  let char_in_range c =
-    (Char.between c 'a' 'j') &&
-       (Char.between(Char.of_int_exn(Char.to_int(c) + ship.size)) 'a' 'j') in
-  let int_in_range i r =
-    ((Int.between i 0 9) &&
-       (Int.between (i + ship.size) 1 9)) in
   let place_ship_at board ps ship =
-    List.fold_left ps
-                   ~init:board
+    List.fold_left ps ~init:board
                    ~f:(fun b a ->
                        let minus = List.Assoc.remove b a in
                        List.Assoc.add minus a (Occupied(ship.ship_type, false))) in
-  match p with
-  | (x, y, Down) ->
-     (match (int_in_range x 9) with
-     | true ->
-        (* position from x,y going down (increasing x) *)
-        let ps = List.map (List.range x (x+ship.size)) ~f: (fun a -> (a, y)) in
+  let gen_positions = function
+    | (x, y, Down) ->
+       List.map (List.range x (x+ship.size)) ~f: (fun a -> (a, y))
+    | (x, y, Across) ->
+       let yi = (Char.to_int y) in
+       List.map (List.range yi (yi+ship.size))
+                ~f: (fun a -> (x, Char.of_int_exn a)) in
 
-        (* lookup each of those positions and place the ship there *)
-        Some (place_ship_at board ps ship)
-     | false -> None)
-  | (x, y, Across) ->
-     (match (char_in_range y) with
-     | true ->
-        (* position from x,y going across (increasing y) *)
-        let yi = (Char.to_int y) in
-        let ps = List.map (List.range yi (yi+ship.size))
-                          ~f: (fun a -> (x, Char.of_int_exn a)) in
+  let valid_position (x, y, direction) size =
+    ((int_in_range x size) && (char_in_range y size)) in
 
-        (* lookup each of those positions and place the ship there *)
+  match (valid_position p ship.size) with
+  | true ->
+     let ps = gen_positions p in
+     (match (positions_unoccupied board ps) with
+     | false ->
         Some (place_ship_at board ps ship)
-     | false -> None)
+     | true ->
+        None)
+  | false -> None
 
 let empty_board =
   let row x =
     List.map columns ~f:(fun y -> ((x, y), Unoccupied)) in
-  let rows = List.map (List.range 0 10) ~f:row in
-  List.join(rows);;
+  List.join(List.map (List.range 0 10) ~f:row);;
 
 let rec random_ship board ship =
   let x = Random.int(10) in
