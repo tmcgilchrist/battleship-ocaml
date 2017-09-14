@@ -1,0 +1,16 @@
+lib: [
+  "_build/install/default/lib/battleship/META" {"META"}
+  "_build/install/default/lib/battleship/opam" {"opam"}
+  "_build/install/default/lib/battleship/battleship.cmi"
+  "_build/install/default/lib/battleship/battleship.cmx"
+  "_build/install/default/lib/battleship/battleship.cmt"
+  "_build/install/default/lib/battleship/battleship.cmti"
+  "_build/install/default/lib/battleship/battleship.mli"
+  "_build/install/default/lib/battleship/battleship.cma"
+  "_build/install/default/lib/battleship/battleship.cmxa"
+  "_build/install/default/lib/battleship/battleship.a"
+  "_build/install/default/lib/battleship/battleship.cmxs"
+]
+doc: [
+  "_build/install/default/doc/battleship/README.md"
+]

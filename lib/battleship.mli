@@ -1,16 +1,20 @@
+open Core_kernel
+
 type ship_type = Carrier
                | Battleship
                | Submarine
                | Cruiser
                | Patrol
+               [@@deriving compare]
 
 type ship = { ship_type : ship_type; size : int; }
 type position = Occupied of ship_type * bool
               | Unoccupied
+              [@@deriving compare]
 
 type direction = Across | Down
 
-type board = (int * char, position) Core.Std.List.Assoc.t
+type board = (int * char, position) List.Assoc.t
 
 val carrier :  ship
 val battleship : ship
@@ -40,7 +44,7 @@ val attack : board ->
 val finished : board -> bool
 
 (** Prints a board as a string for testing *)
-val to_string : board -> bytes
+val to_string : board -> string
 
 (** Prints a formatted board to stdout *)
 val print_board : board -> unit

@@ -1,0 +1,8 @@
+(jbuild_version 1)
+
+(library
+ ((name battleship)
+  (public_name battleship)
+  (wrapped false)
+  (preprocess (pps (ppx_compare)))
+  (libraries (core_kernel))))

@@ -1,26 +1,9 @@
-(* OASIS_START *)
-(* DO NOT EDIT (digest: da26e9ccd930cf96dc4396ad89d1a528) *)
-
 battleship - Battleship simulation library
 ==========================================
 
-See the file [INSTALL.txt](INSTALL.txt) for building and installation
-instructions.
-
-Copyright and license
----------------------
-
-battleship is distributed under the terms of the MIT License.
-
-(* OASIS_STOP *)
-
-
-Battleship
-----------
-
 Build an API for simulating a game of ["Battleship"](http://en.wikipedia.org/wiki/Battleship_(game)).
 
-#### Requirements
+## Requirements
 
 Maintain the state of a game of "Battleship", including four boards,
 two for each player, one for recording the current state of the
@@ -71,9 +54,15 @@ The minimal set of operations we want to support:
  - Determine the current state of the game, finished (and who won),
    in play. (provide finished function for a board)
 
+## Building
 
-TODO
-----------
+Requires an install of opam
+
+    opam install jbuilder
+    jbuilder build
+
+
+## TODO
 
   * Check attack position is valid (Uses List.Assoc.find with an option, if
     invalid position it returns None) (DONE)

@@ -1,18 +1,20 @@
-open Core.Std
+open Core_kernel
 
 type ship_type = Carrier
                | Battleship
                | Submarine
                | Cruiser
                | Patrol
+               [@@deriving compare]
 
 type ship = { ship_type : ship_type; size : int; }
 type position = Occupied of ship_type * bool
               | Unoccupied
+              [@@deriving compare]
 
 type direction = Across | Down
 
-type board = (int * char, position) Core.Std.List.Assoc.t
+type board = (int * char, position) List.Assoc.t
 
 let carrier    = {ship_type = Carrier;    size = 5}
 let battleship = {ship_type = Battleship; size = 4}
@@ -37,19 +39,22 @@ let char_in_range c size =
   (Char.between c 'a' 'j') &&
     (Char.between(Char.of_int_exn(Char.to_int(c) + size)) 'a' 'j')
 
-let positions_unoccupied board p =
+let compare_position_b (x,y) (a,b) =
+  x = a && y = b
+
+let positions_unoccupied board  p =
   List.fold_left p ~init:false
-                 ~f:(fun a c -> match (List.Assoc.find board c) with
-                                | Some (Unoccupied)   -> a
-                                | Some (Occupied (_)) -> a || true
-                                | None                -> a)
+                   ~f:(fun a c -> match (List.Assoc.find board ~equal:compare_position_b c) with
+                                  | Some (Unoccupied)   -> a
+                                  | Some (Occupied (_)) -> a || true
+                                  | None                -> a)
 
 let place_ship board ship p =
   let place_ship_at board ps ship =
     List.fold_left ps ~init:board
                    ~f:(fun b a ->
-                       let minus = List.Assoc.remove b a in
-                       List.Assoc.add minus a (Occupied(ship.ship_type, false))) in
+                       let minus = List.Assoc.remove b a ~equal:compare_position_b in
+                       List.Assoc.add minus ~equal:compare_position_b a (Occupied(ship.ship_type, false))) in
   let gen_positions = function
     | (x, y, Down) ->
        List.map (List.range x (x+ship.size)) ~f: (fun a -> (a, y))
@@ -74,7 +79,7 @@ let place_ship board ship p =
 let empty_board =
   let row x =
     List.map columns ~f:(fun y -> ((x, y), Unoccupied)) in
-  List.join(List.map (List.range 0 10) ~f:row);;
+  List.join(List.map (List.range 0 10) ~f:row)
 
 let rec random_ship board ship =
   let x = Random.int(10) in
@@ -87,10 +92,10 @@ let random_board() =
   List.fold_left all_ships ~init: empty_board ~f:random_ship
 
 let attack board a =
-  match List.Assoc.find board a with
+  match List.Assoc.find board ~equal:compare_position_b a with
   | Some (Occupied (t, _)) ->
-     let minus = List.Assoc.remove board a in
-     let new_board = List.Assoc.add minus a (Occupied(t, true)) in
+     let minus = List.Assoc.remove board  ~equal:compare_position_b a in
+     let new_board = List.Assoc.add minus ~equal:compare_position_b a (Occupied(t, true)) in
      Some new_board
   | Some (Unoccupied) -> None
   | None -> None
@@ -130,4 +135,4 @@ let to_string board =
 let print_board board =
   let heading = List.fold_left columns ~init:""
                                ~f:(fun a c -> sprintf"%s%c       " a c) in
-  Printf.printf "Current board \n %s\n\n%s\n" heading (to_string board)
+  Printf.printf "Current board \n %s\n\n%s\n" heading (to_string @@ board)

@@ -1,5 +1,6 @@
-open Core.Std
-open OUnit2
+open Core
+open OUnit
+
 module B = Battleship
 
 let test_place_ship text_ctx ship position msg =
@@ -13,7 +14,7 @@ let test_place_ship text_ctx ship position msg =
                                              | p, B.Occupied (_,_) -> a + 1
                                              | _, _ -> a) in
        assert_equal ship.size l ~msg:msg
-    | None -> assert_true false
+    | None -> assert_equal false true
 
 let tests =
   "Battleship Tests" >:::
@@ -45,5 +46,5 @@ let tests =
                           assert_equal 15 l ~msg:"All ships should be present on a random board" ~printer:string_of_int)
     ]
 
-let () =
+let _ =
   run_test_tt_main ("all" >::: [tests])
