@@ -3,6 +3,7 @@ battleship - Battleship simulation library
 
 Build an API for simulating a game of ["Battleship"](http://en.wikipedia.org/wiki/Battleship_(game)).
 
+[![Build Status](https://travis-ci.org/tmcgilchrist/battleship-ocaml.svg?branch=master)](https://travis-ci.org/tmcgilchrist/battleship-ocam)
 ## Requirements
 
 Maintain the state of a game of "Battleship", including four boards,
