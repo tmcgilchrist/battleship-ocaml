@@ -32,12 +32,12 @@ let random_direction =
   | false -> Across
 
 let int_in_range i size =
-  ((Int.between i 0 9) &&
-     (Int.between (i + size) 1 9))
+  ((Int.between i ~low:0 ~high:9) &&
+     (Int.between (i + size) ~low:1 ~high:9))
 
 let char_in_range c size =
-  (Char.between c 'a' 'j') &&
-    (Char.between(Char.of_int_exn(Char.to_int(c) + size)) 'a' 'j')
+  (Char.between c ~low:'a' ~high:'j') &&
+    (Char.between(Char.of_int_exn(Char.to_int(c) + size)) ~low:'a' ~high:'j')
 
 let compare_position_b (x,y) (a,b) =
   x = a && y = b
@@ -63,7 +63,7 @@ let place_ship board ship p =
        List.map (List.range yi (yi+ship.size))
                 ~f: (fun a -> (x, Char.of_int_exn a)) in
 
-  let valid_position (x, y, direction) size =
+  let valid_position (x, y, _direction) size =
     ((int_in_range x size) && (char_in_range y size)) in
 
   match (valid_position p ship.size) with
@@ -102,20 +102,20 @@ let attack board a =
 
 let finished board =
   let hit h p = match p with
-    | (x,y), Occupied (t, true) -> h+1
-    | (x,y), Occupied (t, false) -> h
-    | (x,y), Unoccupied -> h in
+    | (_x,_y), Occupied (_t, true) -> h+1
+    | (_x,_y), Occupied (_t, false) -> h
+    | (_x,_y), Unoccupied -> h in
   let hits = List.fold_left board ~init:0 ~f:hit in
   hits = List.fold_left all_ships ~init:0 ~f:(fun a s -> a + s.size)
 
 (********************** Scratch / Util **********************)
 
 let print_cell str cell =
-  let new_line col row = match col with
+  let new_line col _row = match col with
     | 'j' -> "\n"
     | _ -> "" in
   match cell with
-  | (x,y), Occupied (ship_type, hit) ->
+  | (x,y), Occupied (_ship_type, _hit) ->
      sprintf "%s S(%i,%c) %s" str x y (new_line y x)
   | (x,y), Unoccupied                ->
      sprintf "%s U(%i,%c) %s" str x y (new_line y x)
@@ -126,7 +126,7 @@ let sort_board board =
     let compare_fst = compare x x' in
     if compare_fst <> 0 then compare_fst
     else compare y y' in
-  List.sort ~cmp:lex_cmp board
+  List.sort ~compare:lex_cmp board
 
 let to_string board =
   let sorted_board = sort_board board in
