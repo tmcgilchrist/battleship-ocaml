@@ -16,7 +16,7 @@ build-test: [
 build-doc: [ "ocaml" "setup.ml" "-doc" ]
 depends: [
   "core_kernel" {>= "0.9.0"}
-  "jbuilder" {build & >= "1.0+beta10"}
+  "dune" {build}
   "ounit" {test & >= "1.0.2"}
 ]
 available: [ ocaml-version >= "4.05" ]

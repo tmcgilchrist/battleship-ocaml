@@ -1,0 +1,10 @@
+(executables
+ (libraries battleship oUnit core_kernel)
+ (modules board_test)
+ (names board_test))
+
+(alias
+ (name runtest)
+ (package battleship)
+ (deps board_test.exe)
+ (action (run %{deps})))
